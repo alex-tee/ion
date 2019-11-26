@@ -50,6 +50,7 @@ endforeach
 ion_deps = [
   dependency('glfw3'),
   dependency('gl'),
+  dependency('pangocairo'),
 ]
 
 subdir ('src')

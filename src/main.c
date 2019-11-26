@@ -19,9 +19,15 @@
 
 #include <stdio.h>
 
+#include <pango/pangocairo.h>
 #include <GLFW/glfw3.h>
 
+#include "gui/gl.h"
+#include "utils/pango.h"
+
 #define PROJECT_NAME "Ion"
+#define FONT "Sans Bold 18"
+#define TEXT "testτεστ"
 
 int main (
   int argc, char **argv)
@@ -34,7 +40,9 @@ int main (
       return -1;
     }
 
-  /* Create a windowed mode window and its OpenGL context */
+  /* Create a windowed mode window and its OpenGL
+   * context */
+  glfwWindowHint (GLFW_SAMPLES, 4);
   window =
     glfwCreateWindow (
       640, 480, PROJECT_NAME, NULL, NULL);
@@ -47,11 +55,19 @@ int main (
   /* Make the window's context current */
   glfwMakeContextCurrent(window);
 
+  /* init openGL */
+  ion_gl_init ();
+
+  IonGlTexture * texture =
+    ion_pango_render_text_to_texture (FONT, TEXT);
+
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window))
     {
       /* Render here */
       glClear(GL_COLOR_BUFFER_BIT);
+
+      ion_gl_draw_texture (texture, 0.f, 0.f);
 
       /* Swap front and back buffers */
       glfwSwapBuffers(window);
@@ -59,6 +75,9 @@ int main (
       /* Poll for and process events */
       glfwPollEvents();
     }
+
+  /* Clean up */
+  glDeleteTextures (1, &texture->id);
 
   glfwTerminate();
 

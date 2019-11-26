@@ -15,22 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
-ion_main = files ('main.c')
-ion_srcs = files ([])
-
-subdir ('gui')
-subdir ('utils')
-
-ion_exe = executable(
-  'ion',
-  sources: [
-    ion_main,
-    ion_srcs,
-    ],
-  dependencies: ion_deps,
-  include_directories: all_inc,
-  c_args: ion_cflags,
-  install: true,
-  )
-
-test('basic', ion_exe)
+ion_srcs += files ([
+  'gl.c'
+  ])
