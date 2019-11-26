@@ -16,7 +16,7 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_main = files ('main.c')
-ion_srcs = files ([])
+ion_srcs = files (['glad.c'])
 
 subdir ('gui')
 subdir ('utils')
@@ -30,6 +30,7 @@ ion_exe = executable(
   dependencies: ion_deps,
   include_directories: all_inc,
   c_args: ion_cflags,
+  #link_args: ion_ldflags,
   install: true,
   )
 

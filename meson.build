@@ -20,7 +20,7 @@ project(
   version : '0.1',
   license: 'AGPLv3+',
   default_options: [
-    'warning_level=3',
+    'warning_level=2',
     'buildtype=debug',
     'c_std=gnu11',
     ],
@@ -40,17 +40,20 @@ try_ion_cflags = [
   '-Wno-unused-parameter',
   ]
 
-ion_cflags = []
-foreach f : try_ion_cflags
-  if cc.has_argument (f)
-    ion_cflags += f
-  endif
-endforeach
+ion_cflags = cc.get_supported_arguments (
+  try_ion_cflags)
+
+#try_ion_ldflags = [
+  #'-ldl',
+  #]
+#ion_ldflags = cc.get_supported_link_arguments (
+  #try_ion_ldflags)
 
 ion_deps = [
   dependency('glfw3'),
   dependency('gl'),
   dependency('pangocairo'),
+  cc.find_library('dl', required: false),
 ]
 
 subdir ('src')

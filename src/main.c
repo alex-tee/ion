@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 
+#include <glad/glad.h>
 #include <pango/pangocairo.h>
 #include <GLFW/glfw3.h>
 
@@ -28,6 +29,36 @@
 #define PROJECT_NAME "Ion"
 #define FONT "Sans Bold 18"
 #define TEXT "testτεστ"
+
+/**
+ * Called whenever the window size changed (by OS
+ * or user resize).
+ */
+void framebuffer_size_cb (
+  GLFWwindow * window,
+  int          width,
+  int          height)
+{
+  /* make sure the viewport matches the new window
+   * dimensions */
+  glViewport (0, 0, width, height);
+}
+
+static void
+mouse_cb (
+  GLFWwindow* window,
+  double xpos,
+  double ypos)
+{
+}
+
+static void scroll_cb (
+  GLFWwindow* window,
+  double xoffset,
+  double yoffset)
+{
+}
+
 
 int main (
   int argc, char **argv)
@@ -39,21 +70,38 @@ int main (
     {
       return -1;
     }
+  glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint (
+    GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint (GLFW_SAMPLES, 4);
 
   /* Create a windowed mode window and its OpenGL
    * context */
-  glfwWindowHint (GLFW_SAMPLES, 4);
   window =
     glfwCreateWindow (
       640, 480, PROJECT_NAME, NULL, NULL);
   if (!window)
     {
       glfwTerminate ();
-      return -1;
+      g_error ("failed to create window");
     }
 
   /* Make the window's context current */
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent (window);
+
+  /* set callbacks */
+  glfwSetFramebufferSizeCallback (
+    window, framebuffer_size_cb);
+  glfwSetCursorPosCallback (window, mouse_cb);
+  glfwSetScrollCallback (window, scroll_cb);
+
+  /* init GLAD */
+  if (!gladLoadGLLoader (
+        (GLADloadproc) glfwGetProcAddress))
+    {
+      g_error ("Failed to initialize GLAD");
+    }
 
   /* init openGL */
   ion_gl_init ();
@@ -64,16 +112,22 @@ int main (
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window))
     {
-      /* Render here */
-      glClear(GL_COLOR_BUFFER_BIT);
+      /* frame logic */
+      float current_frame = glfwGetTime ();
+      (void) current_frame;
 
+      /* process user input */
+      /*process_input (window);*/
+
+      /* Render */
+      glClear(GL_COLOR_BUFFER_BIT);
       ion_gl_draw_texture (texture, 0.f, 0.f);
 
       /* Swap front and back buffers */
-      glfwSwapBuffers(window);
+      glfwSwapBuffers (window);
 
       /* Poll for and process events */
-      glfwPollEvents();
+      glfwPollEvents ();
     }
 
   /* Clean up */
