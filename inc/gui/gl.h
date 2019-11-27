@@ -26,6 +26,12 @@
 #ifndef __GUI_GL_H__
 #define __GUI_GL_H__
 
+/* see https://www.rapidtables.com/web/dev/screen-resolution-statistics.html */
+#define ION_GL_WINDOW_WIDTH 1366
+#define ION_GL_WINDOW_HEIGHT 768
+#define ION_GL_MIN_WINDOW_WIDTH 1280
+#define ION_GL_MIN_WINDOW_HEIGHT 720
+
 /**
  * Texture info.
  */
@@ -43,6 +49,16 @@ typedef struct IonGlTexture
  */
 void
 ion_gl_init ();
+
+/**
+ * Draws a test triangle.
+ */
+void
+ion_gl_draw_test_triangle (
+  float x,
+  float y,
+  float width,
+  float height);
 
 /**
  * Generate a texture with an ID for the given data

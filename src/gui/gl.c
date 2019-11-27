@@ -19,13 +19,13 @@
 
 #include <stdlib.h>
 
+/*#include <glad/glad.h>*/
 #include <GLFW/glfw3.h>
 #include <glib.h>
 
-#include "gui/gl.h"
+#include <nanovg.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#include "gui/gl.h"
 
 /**
  * Initialization during startup.
@@ -42,10 +42,13 @@ ion_gl_init ()
 
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable (GL_TEXTURE_2D);
-  glViewport (0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+  glViewport (
+    0, 0, ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT);
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  glOrtho (0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
+  glOrtho (
+    0, ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT,
+    0, -1, 1);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 }
@@ -77,7 +80,36 @@ ion_gl_create_texture (
   texture->width = width;
   texture->height = height;
 
+  g_message (
+    "created texture %d with width %u and height %u",
+    texture->id, width, height);
+
   return texture;
+}
+
+/**
+ * Draws a test triangle.
+ */
+void
+ion_gl_draw_test_triangle (
+  float x,
+  float y,
+  float width,
+  float height)
+{
+  glPushMatrix ();
+  glBindTexture (GL_TEXTURE_2D, 0);
+
+  glColor3f (0.f, 1.0f, 1.0f);
+  glBegin (GL_QUADS);
+  glVertex2f (x, y);
+  glVertex2f (x + width, y);
+  glVertex2f (
+    x + width, y + height);
+  glVertex2f (x, y + height);
+  glEnd ();
+
+  glPopMatrix ();
 }
 
 /**

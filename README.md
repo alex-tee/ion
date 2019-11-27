@@ -1,7 +1,12 @@
 Ion
 ===
 
-Ion is a rhythm game TODO
+Ion is a rhythm game modelled closely after osu!
+
+It is written in C using OpenGL and pangocairo for
+graphics.
+
+This is a WIP
 
 # License
 AGPLv3+

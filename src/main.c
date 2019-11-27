@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 
-#include <glad/glad.h>
 #include <pango/pangocairo.h>
 #include <GLFW/glfw3.h>
 
@@ -41,6 +40,9 @@ void framebuffer_size_cb (
 {
   /* make sure the viewport matches the new window
    * dimensions */
+  g_message (
+    "changing viewport to (%d, %d)",
+    width, height);
   glViewport (0, 0, width, height);
 }
 
@@ -59,33 +61,64 @@ static void scroll_cb (
 {
 }
 
+static void
+error_cb (
+  int          error,
+  const char * description)
+{
+  g_critical (
+    "A GLFW error occurred (%d): %s",
+    error, description);
+}
+
+static void
+window_close_cb (
+  GLFWwindow* window)
+{
+  g_message ("closing window");
+  /*if (!time_to_close)*/
+    /*glfwSetWindowShouldClose(window, GLFW_FALSE);*/
+}
 
 int main (
   int argc, char **argv)
 {
-  GLFWwindow* window;
+  g_message (
+    "GLFW version %s",
+    glfwGetVersionString ());
+
+  glfwSetErrorCallback (error_cb);
 
   /* Initialize the library */
   if (!glfwInit ())
     {
       return -1;
     }
-  glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint (
-    GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint (GLFW_SAMPLES, 4);
 
   /* Create a windowed mode window and its OpenGL
    * context */
-  window =
+  glfwWindowHint (GLFW_SAMPLES, 4);
+  glfwWindowHint (GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  GLFWwindow * window =
     glfwCreateWindow (
-      640, 480, PROJECT_NAME, NULL, NULL);
+      ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT,
+      PROJECT_NAME, NULL, NULL);
   if (!window)
     {
       glfwTerminate ();
-      g_error ("failed to create window");
+      g_error ("failed to create GLFW window");
     }
+  glfwSetWindowSizeLimits (
+    window, ION_GL_MIN_WINDOW_WIDTH,
+    ION_GL_MIN_WINDOW_HEIGHT, GLFW_DONT_CARE,
+    GLFW_DONT_CARE);
+  glfwSetWindowAspectRatio (window, 16, 9);
+
+  /* set window icon */
+  /*GLFWimage images[2];*/
+  /*images[0] = load_icon ("my_icon.png");*/
+  /*images[1] = load_icon ("my_icon_small.png");*/
+  /*glfwSetWindowIcon (window, 2, images);*/
 
   /* Make the window's context current */
   glfwMakeContextCurrent (window);
@@ -95,13 +128,8 @@ int main (
     window, framebuffer_size_cb);
   glfwSetCursorPosCallback (window, mouse_cb);
   glfwSetScrollCallback (window, scroll_cb);
-
-  /* init GLAD */
-  if (!gladLoadGLLoader (
-        (GLADloadproc) glfwGetProcAddress))
-    {
-      g_error ("Failed to initialize GLAD");
-    }
+  glfwSetWindowCloseCallback (
+    window, window_close_cb);
 
   /* init openGL */
   ion_gl_init ();
@@ -112,16 +140,11 @@ int main (
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window))
     {
-      /* frame logic */
-      float current_frame = glfwGetTime ();
-      (void) current_frame;
-
-      /* process user input */
-      /*process_input (window);*/
-
       /* Render */
       glClear(GL_COLOR_BUFFER_BIT);
       ion_gl_draw_texture (texture, 0.f, 0.f);
+      ion_gl_draw_test_triangle (
+        0.f, 0.f, 20.f, 20.f);
 
       /* Swap front and back buffers */
       glfwSwapBuffers (window);
