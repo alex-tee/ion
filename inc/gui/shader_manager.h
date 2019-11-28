@@ -20,28 +20,28 @@
 /**
  * \file
  *
- * Pango utils.
+ * GLSL shader manager.
  */
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
+#ifndef __GUI_SHADER_MANAGER_H__
+#define __GUI_SHADER_MANAGER_H__
 
-typedef struct Texture Texture;
+typedef struct Shader Shader;
 
 /**
- * @addtogroup utils
+ * @addtogroup gui
  *
  * @{
  */
 
-/**
- * Renders the given text in the given font to a
- * GL texture.
- */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
+typedef struct ShaderManager
+{
+  Shader *      rotate_2d_shader;
+  Shader *      unchanged_shader;
+} ShaderManager;
+
+ShaderManager *
+shader_manager_new (void);
 
 /**
  * @}

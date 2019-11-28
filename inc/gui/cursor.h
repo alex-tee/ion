@@ -17,31 +17,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * \file
- *
- * Pango utils.
- */
-
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
+#ifndef __GUI_CURSOR_H__
+#define __GUI_CURSOR_H__
 
 typedef struct Texture Texture;
 
 /**
- * @addtogroup utils
+ * @addtogroup gui
  *
  * @{
  */
 
+/** Times to rotate per second, if rotate is on. */
+#define CURSOR_RPM 80
+
 /**
- * Renders the given text in the given font to a
- * GL texture.
+ * A drawable cursor, as part of a Skin.
  */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
+typedef struct Cursor
+{
+  /** Whether the cursor should expand when clicked. */
+  int             expand;
+
+  /** Whether the cursor should rotate constantly. */
+  int             rotate;
+
+  /** Last rotation angle. */
+  float           last_angle;
+
+  Texture *       cursor;
+  Texture *       cursor_middle;
+  Texture *       cursor_smoke;
+  Texture *       cursor_trail;
+} Cursor;
+
+void
+cursor_draw (
+  Cursor * self);
 
 /**
  * @}

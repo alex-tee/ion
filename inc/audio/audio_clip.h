@@ -20,31 +20,39 @@
 /**
  * \file
  *
- * Pango utils.
+ * Audio clip.
  */
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
-
-typedef struct Texture Texture;
+#ifndef __AUDIO_AUDIO_CLIP_H__
+#define __AUDIO_AUDIO_CLIP_H__
 
 /**
- * @addtogroup utils
+ * @addtogroup audio
  *
  * @{
  */
 
 /**
- * Renders the given text in the given font to a
- * GL texture.
+ * An audio clip to be used for small audio files.
  */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
+typedef struct AudioClip
+{
+  char *       abs_path;
+  float *      frames;
+  int          num_frames;
+  unsigned int num_channels;
+} AudioClip;
+
+/**
+ * Creates a new audio clip.
+ */
+AudioClip *
+audio_clip_new (
+  const char * abs_path);
 
 /**
  * @}
  */
 
 #endif
+

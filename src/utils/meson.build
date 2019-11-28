@@ -16,6 +16,7 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_srcs += files ([
-  'pango.c'
+  'pango.c',
+  'io.c',
   ])
 

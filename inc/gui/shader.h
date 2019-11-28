@@ -20,28 +20,32 @@
 /**
  * \file
  *
- * Pango utils.
+ * GLSL shader.
  */
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
-
-typedef struct Texture Texture;
+#ifndef __GUI_SHADER_H__
+#define __GUI_SHADER_H__
 
 /**
- * @addtogroup utils
+ * @addtogroup gui
  *
  * @{
  */
 
-/**
- * Renders the given text in the given font to a
- * GL texture.
- */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
+typedef struct Shader
+{
+  /**
+   * OpenGL shader program ID.
+   *
+   * For now, each program has 1 vertex shader and 1
+   * fragment shader.
+   */
+  unsigned int    program_id;
+} Shader;
+
+Shader *
+shader_new (
+  const char * filepath);
 
 /**
  * @}

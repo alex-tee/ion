@@ -38,6 +38,7 @@ all_inc = [
 
 try_ion_cflags = [
   '-Wno-unused-parameter',
+  '-Werror=implicit-function-declaration',
   ]
 
 ion_cflags = cc.get_supported_arguments (
@@ -53,7 +54,9 @@ ion_deps = [
   dependency('glfw3'),
   dependency('gl'),
   dependency('pangocairo'),
+  dependency('glew'),
   cc.find_library('dl', required: false),
+  cc.find_library('SOIL'),
 ]
 
 subdir ('src')

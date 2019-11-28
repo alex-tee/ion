@@ -20,13 +20,14 @@
 #include <pango/pangocairo.h>
 
 #include "gui/gl.h"
+#include "gui/texture.h"
 #include "utils/pango.h"
 
 /**
  * Renders the given text in the given font to a
  * GL texture.
  */
-IonGlTexture *
+Texture *
 ion_pango_render_text_to_texture (
   const char * font_descr,
   const char * text)
@@ -95,8 +96,8 @@ ion_pango_render_text_to_texture (
 
   /* generate an openGL texture ID for the rendered
    * data */
-  IonGlTexture * texture =
-    ion_gl_create_texture (
+  Texture * texture =
+    texture_new_from_raw_data (
       width, height, surface_data);
 
   /* Clean up */

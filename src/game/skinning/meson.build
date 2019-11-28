@@ -16,9 +16,6 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_srcs += files ([
-  'cursor.c',
-  'gl.c',
-  'shader.c',
-  'shader_manager.c',
-  'texture.c',
+  'skin_manager.c',
+  'skin.c',
   ])

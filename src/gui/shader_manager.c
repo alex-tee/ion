@@ -17,34 +17,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * \file
- *
- * Pango utils.
- */
+#include <stdlib.h>
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
+#include "gui/shader.h"
+#include "gui/shader_manager.h"
 
-typedef struct Texture Texture;
+ShaderManager *
+shader_manager_new (void)
+{
+  ShaderManager * self =
+    calloc (1, sizeof (ShaderManager));
 
-/**
- * @addtogroup utils
- *
- * @{
- */
+  /*self->rotate_2d_shader =*/
+    /*shader_new (*/
+      /*SHADER_TYPE_VERTEX,*/
+      /*"rotate_by_angle.vert");*/
+  self->unchanged_shader =
+    shader_new (
+      "unchanged");
 
-/**
- * Renders the given text in the given font to a
- * GL texture.
- */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
-
-/**
- * @}
- */
-
-#endif
+  return self;
+}

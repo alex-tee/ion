@@ -20,31 +20,18 @@
 /**
  * \file
  *
- * Pango utils.
+ * Matrix.
  */
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
+#ifndef __MAX_MATRIX_H__
+#define __MAX_MATRIX_H__
 
-typedef struct Texture Texture;
-
-/**
- * @addtogroup utils
- *
- * @{
- */
-
-/**
- * Renders the given text in the given font to a
- * GL texture.
- */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
-
-/**
- * @}
- */
+typedef struct Matrix
+{
+  float x;
+  float y;
+  float z;
+  float w;
+} Matrix;
 
 #endif

@@ -19,19 +19,20 @@
 
 #include <stdlib.h>
 
-/*#include <glad/glad.h>*/
 #include <GLFW/glfw3.h>
 #include <glib.h>
 
 #include <nanovg.h>
 
 #include "gui/gl.h"
+#include "gui/texture.h"
 
 /**
  * Initialization during startup.
  */
 void
-ion_gl_init ()
+ion_gl_init (
+  GLFWwindow * window)
 {
   glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
   glDisable (GL_DEPTH_TEST);
@@ -40,58 +41,25 @@ ion_gl_init ()
   /* enable multisampling (for antialiasing) */
   glEnable(GL_MULTISAMPLE);
 
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  int width, height;
+  glfwGetFramebufferSize (window, &width, &height);
+  glViewport (0, 0, width, height);
+
+  glBlendFunc (
+    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable (GL_TEXTURE_2D);
-  glViewport (
-    0, 0, ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT);
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  glOrtho (
-    0, ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT,
-    0, -1, 1);
+  glOrtho (0, width, height, 0, -1, 1);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-}
-
-/**
- * Generate a texture with an ID for the given data
- * of the given dimensions.
- */
-IonGlTexture *
-ion_gl_create_texture (
-  unsigned int    width,
-  unsigned int    height,
-  unsigned char * pixels)
-{
-  IonGlTexture * texture =
-    calloc (1, sizeof (IonGlTexture));
-
-  glGenTextures (1, &texture->id);
-  glBindTexture (GL_TEXTURE_2D, texture->id);
-  glTexParameteri (
-    GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    GL_LINEAR);
-  glTexParameteri (
-    GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D (
-    GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-    0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
-
-  texture->width = width;
-  texture->height = height;
-
-  g_message (
-    "created texture %d with width %u and height %u",
-    texture->id, width, height);
-
-  return texture;
 }
 
 /**
  * Draws a test triangle.
  */
 void
-ion_gl_draw_test_triangle (
+ion_gl_draw_test_rectangle (
   float x,
   float y,
   float width,
@@ -107,38 +75,6 @@ ion_gl_draw_test_triangle (
   glVertex2f (
     x + width, y + height);
   glVertex2f (x, y + height);
-  glEnd ();
-
-  glPopMatrix ();
-}
-
-/**
- * Draws the texture in the given rectangle.
- */
-void
-ion_gl_draw_texture (
-  IonGlTexture * texture,
-  float          x,
-  float          y)
-{
-  /* Render a texture in immediate mode. */
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
-  glClear (GL_COLOR_BUFFER_BIT);
-  glPushMatrix ();
-  glBindTexture (GL_TEXTURE_2D, texture->id);
-  glColor3f (1.f, 1.0f, 1.0f);
-
-  glBegin (GL_QUADS);
-  glTexCoord2f (0.0f, 0.0f);
-  glVertex2f (x, y);
-  glTexCoord2f (1.0f, 0.0f);
-  glVertex2f (x + texture->width, y);
-  glTexCoord2f (1.0f, 1.0f);
-  glVertex2f (
-    x + texture->width, y + texture->height);
-  glTexCoord2f (0.0f, 1.0f);
-  glVertex2f (x, y + texture->height);
   glEnd ();
 
   glPopMatrix ();

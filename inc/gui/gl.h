@@ -26,57 +26,29 @@
 #ifndef __GUI_GL_H__
 #define __GUI_GL_H__
 
+typedef struct GLFWwindow GLFWwindow;
+
 /* see https://www.rapidtables.com/web/dev/screen-resolution-statistics.html */
-#define ION_GL_WINDOW_WIDTH 1366
-#define ION_GL_WINDOW_HEIGHT 768
+//#define ION_GL_WINDOW_WIDTH 1366
+//#define ION_GL_WINDOW_HEIGHT 768
 #define ION_GL_MIN_WINDOW_WIDTH 1280
 #define ION_GL_MIN_WINDOW_HEIGHT 720
-
-/**
- * Texture info.
- */
-typedef struct IonGlTexture
-{
-  /** OpenGL texture ID. */
-  unsigned int    id;
-  unsigned int    width;
-  unsigned int    height;
-  unsigned char * pixels;
-} IonGlTexture;
 
 /**
  * Initialization during startup.
  */
 void
-ion_gl_init ();
+ion_gl_init (
+  GLFWwindow * window);
 
 /**
  * Draws a test triangle.
  */
 void
-ion_gl_draw_test_triangle (
+ion_gl_draw_test_rectangle (
   float x,
   float y,
   float width,
   float height);
-
-/**
- * Generate a texture with an ID for the given data
- * of the given dimensions.
- */
-IonGlTexture *
-ion_gl_create_texture (
-  unsigned int    width,
-  unsigned int    height,
-  unsigned char * pixels);
-
-/**
- * Draws the texture in the given rectangle.
- */
-void
-ion_gl_draw_texture (
-  IonGlTexture * texture,
-  float          x,
-  float          y);
 
 #endif

@@ -20,14 +20,15 @@
 #include <stdio.h>
 
 #include <pango/pangocairo.h>
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "game/ion_world.h"
 #include "gui/gl.h"
+#include "gui/texture.h"
 #include "utils/pango.h"
 
 #define PROJECT_NAME "Ion"
-#define FONT "Sans Bold 18"
-#define TEXT "testτεστ"
 
 /**
  * Called whenever the window size changed (by OS
@@ -43,7 +44,9 @@ void framebuffer_size_cb (
   g_message (
     "changing viewport to (%d, %d)",
     width, height);
-  glViewport (0, 0, width, height);
+  ion_gl_init (window);
+
+  ion_world_update_texture_sizes (ION_WORLD);
 }
 
 static void
@@ -101,18 +104,18 @@ int main (
   glfwWindowHint (GLFW_DOUBLEBUFFER, GLFW_TRUE);
   GLFWwindow * window =
     glfwCreateWindow (
-      ION_GL_WINDOW_WIDTH, ION_GL_WINDOW_HEIGHT,
-      PROJECT_NAME, NULL, NULL);
+      1920, 1080,
+      PROJECT_NAME, glfwGetPrimaryMonitor (), NULL);
   if (!window)
     {
       glfwTerminate ();
       g_error ("failed to create GLFW window");
     }
-  glfwSetWindowSizeLimits (
-    window, ION_GL_MIN_WINDOW_WIDTH,
-    ION_GL_MIN_WINDOW_HEIGHT, GLFW_DONT_CARE,
-    GLFW_DONT_CARE);
-  glfwSetWindowAspectRatio (window, 16, 9);
+  /*glfwSetWindowSizeLimits (*/
+    /*window, ION_GL_MIN_WINDOW_WIDTH,*/
+    /*ION_GL_MIN_WINDOW_HEIGHT, GLFW_DONT_CARE,*/
+    /*GLFW_DONT_CARE);*/
+  /*glfwSetWindowAspectRatio (window, 16, 9);*/
 
   /* set window icon */
   /*GLFWimage images[2];*/
@@ -131,20 +134,28 @@ int main (
   glfwSetWindowCloseCallback (
     window, window_close_cb);
 
-  /* init openGL */
-  ion_gl_init ();
+  /* hide cursor */
+  glfwSetInputMode (
+    window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-  IonGlTexture * texture =
-    ion_pango_render_text_to_texture (FONT, TEXT);
+  /* init openGL */
+  ion_gl_init (window);
+
+  GLenum err = glewInit ();
+  if (GLEW_OK != err)
+    {
+      g_error (
+        "GLEW init failed: %s",
+        glewGetErrorString (err));
+    }
+
+  ION_WORLD = ion_world_new (window);
 
   /* Loop until the user closes the window */
-  while (!glfwWindowShouldClose(window))
+  while (!glfwWindowShouldClose (window))
     {
       /* Render */
-      glClear(GL_COLOR_BUFFER_BIT);
-      ion_gl_draw_texture (texture, 0.f, 0.f);
-      ion_gl_draw_test_triangle (
-        0.f, 0.f, 20.f, 20.f);
+      ion_world_render_scene (ION_WORLD);
 
       /* Swap front and back buffers */
       glfwSwapBuffers (window);
@@ -154,7 +165,7 @@ int main (
     }
 
   /* Clean up */
-  glDeleteTextures (1, &texture->id);
+  ion_world_free (ION_WORLD);
 
   glfwTerminate();
 

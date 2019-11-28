@@ -20,28 +20,36 @@
 /**
  * \file
  *
- * Pango utils.
+ * Skin manager.
  */
 
-#ifndef __UTILS_PANGO_H__
-#define __UTILS_PANGO_H__
+#ifndef __GAME_SKINNING_SKIN_MANAGER_H__
+#define __GAME_SKINNING_SKIN_MANAGER_H__
 
-typedef struct Texture Texture;
+typedef struct Skin Skin;
+typedef struct IonWorld IonWorld;
 
 /**
- * @addtogroup utils
+ * @addtogroup skinning
  *
  * @{
  */
 
+typedef struct SkinManager
+{
+  Skin *       current_skin;
+  Skin *       available_skins[200];
+  int          num_available_skins;
+
+  /* TODO */
+} SkinManager;
+
 /**
- * Renders the given text in the given font to a
- * GL texture.
+ * Creates and initializes the skin manager.
  */
-Texture *
-ion_pango_render_text_to_texture (
-  const char * font_descr,
-  const char * text);
+SkinManager *
+skin_manager_new (
+  const char * skins_dir);
 
 /**
  * @}

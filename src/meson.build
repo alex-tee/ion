@@ -18,7 +18,9 @@
 ion_main = files ('main.c')
 ion_srcs = files ([])
 
+subdir ('game')
 subdir ('gui')
+subdir ('math')
 subdir ('utils')
 
 ion_exe = executable(
