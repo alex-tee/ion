@@ -19,13 +19,19 @@
 
 #include <stdio.h>
 
+#include <glad/glad_glx.h>
 #include <pango/pangocairo.h>
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "game/ion_world.h"
 #include "gui/gl.h"
+#include "gui/drawable.h"
+#include "gui/shader.h"
+#include "gui/shader_manager.h"
+#include "gui/skin.h"
+#include "gui/skin_manager.h"
 #include "gui/texture.h"
+#include "math/vector.h"
 #include "utils/pango.h"
 
 #define PROJECT_NAME "Ion"
@@ -44,9 +50,14 @@ void framebuffer_size_cb (
   g_message (
     "changing viewport to (%d, %d)",
     width, height);
-  ion_gl_init (window);
+  if (ION_WORLD)
+    {
+      ION_WORLD->viewport_width = width;;
+      ION_WORLD->viewport_height = height;;
+      ion_gl_init (window);
+    }
 
-  ion_world_update_texture_sizes (ION_WORLD);
+  /*ion_world_update_texture_sizes (ION_WORLD);*/
 }
 
 static void
@@ -86,6 +97,8 @@ window_close_cb (
 int main (
   int argc, char **argv)
 {
+  ION_WORLD = NULL;
+
   g_message (
     "GLFW version %s",
     glfwGetVersionString ());
@@ -100,21 +113,30 @@ int main (
 
   /* Create a windowed mode window and its OpenGL
    * context */
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint (
+    GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint (GLFW_SAMPLES, 4);
   glfwWindowHint (GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  GLFWmonitor * monitor = glfwGetPrimaryMonitor ();
+  g_return_val_if_fail (monitor, -1);
+  const GLFWvidmode* mode =
+    glfwGetVideoMode (monitor);
+  g_return_val_if_fail (mode, -1);
   GLFWwindow * window =
     glfwCreateWindow (
-      1920, 1080,
-      PROJECT_NAME, glfwGetPrimaryMonitor (), NULL);
+      mode->width, mode->height,
+      PROJECT_NAME, monitor, NULL);
   if (!window)
     {
       glfwTerminate ();
       g_error ("failed to create GLFW window");
     }
-  /*glfwSetWindowSizeLimits (*/
-    /*window, ION_GL_MIN_WINDOW_WIDTH,*/
-    /*ION_GL_MIN_WINDOW_HEIGHT, GLFW_DONT_CARE,*/
-    /*GLFW_DONT_CARE);*/
+  glfwSetWindowSizeLimits (
+    window, mode->width,
+    mode->height, mode->width,
+    mode->height);
   /*glfwSetWindowAspectRatio (window, 16, 9);*/
 
   /* set window icon */
@@ -134,6 +156,15 @@ int main (
   glfwSetWindowCloseCallback (
     window, window_close_cb);
 
+  if (!gladLoadGLLoader (
+        (GLADloadproc) glfwGetProcAddress))
+    {
+      g_error ("failed to load glad");
+    }
+  g_message (
+    "OpenGL %d.%d",
+    GLVersion.major, GLVersion.minor);
+
   /* hide cursor */
   glfwSetInputMode (
     window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -141,15 +172,21 @@ int main (
   /* init openGL */
   ion_gl_init (window);
 
-  GLenum err = glewInit ();
-  if (GLEW_OK != err)
+  ION_WORLD =
+    ion_world_new (
+      window, mode->width, mode->height);
+
+  /* loop a couple of times to let the frame
+   * buffer size stabilize */
+  for (int i = 0; i < 10; i++)
     {
-      g_error (
-        "GLEW init failed: %s",
-        glewGetErrorString (err));
+      glClear (GL_COLOR_BUFFER_BIT);
+      glfwSwapBuffers (window);
+      glfwPollEvents ();
     }
 
-  ION_WORLD = ion_world_new (window);
+  /* load skin with textures used for the game */
+  ion_world_load_skin (ION_WORLD);
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose (window))

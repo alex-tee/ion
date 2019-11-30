@@ -18,5 +18,6 @@
 ion_srcs += files ([
   'pango.c',
   'io.c',
+  'math.c',
   ])
 

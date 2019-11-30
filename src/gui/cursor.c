@@ -22,12 +22,14 @@
 
 #include "game/ion_world.h"
 #include "gui/cursor.h"
+#include "gui/drawable.h"
 #include "gui/texture.h"
 #include "math/matrix.h"
+#include "utils/math.h"
 
 void
 cursor_draw (
-  Cursor * self)
+  IonCursor * self)
 {
   int fb_width, fb_height;
   glfwGetFramebufferSize (
@@ -37,17 +39,23 @@ cursor_draw (
     ION_WORLD->window, &win_width, &win_height);
 
   double xpos, ypos;
-  glfwGetCursorPos (ION_WORLD->window, &xpos, &ypos);
+  glfwGetCursorPos (
+    ION_WORLD->window, &xpos, &ypos);
   xpos =
-    (xpos * (double) fb_width) / (double) win_width;
+    (xpos * (double) fb_width) /
+    (double) win_width;
   ypos =
-    (ypos * (double) fb_height) / (double) win_height;
+    (ypos * (double) fb_height) /
+    (double) win_height;
+  /* invert the y position to be OpenGL friendly */
+  ypos = fb_height - ypos;
 
-  Texture * texture = self->cursor;
+  Texture * texture = self->cursor->texture;
   float start_xpos =
     (float) xpos - (float) texture->width / 2.f;
   float start_ypos =
     (float) ypos - (float) texture->height / 2.f;
+  Vector2f position = { start_xpos, start_ypos };
 
   if (self->rotate)
     {
@@ -61,9 +69,20 @@ cursor_draw (
       if (self->last_angle > 360.f)
         self->last_angle -= 360.f;
       /*g_message ("current rotation %f", rotation.w);*/
+
+      self->cursor->angle = self->last_angle;
     }
 
-  texture_draw (
-    texture, start_xpos, start_ypos,
-    self->last_angle, 1.f);
+  if (!math_floats_equal (
+        self->cursor->position.x,
+        position.x, 0.5f) ||
+      !math_floats_equal (
+        self->cursor->position.y,
+        position.y, 0.5f))
+    {
+      drawable_update_position (
+        self->cursor, &position,
+        &self->cursor->size);
+    }
+  drawable_draw (self->cursor);
 }

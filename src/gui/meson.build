@@ -17,8 +17,12 @@
 
 ion_srcs += files ([
   'cursor.c',
+  'drawable.c',
   'gl.c',
+  'main_menu.c',
   'shader.c',
   'shader_manager.c',
+  'skin.c',
+  'skin_manager.c',
   'texture.c',
   ])

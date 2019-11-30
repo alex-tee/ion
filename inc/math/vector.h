@@ -20,43 +20,33 @@
 /**
  * \file
  *
- * GLSL shader.
+ * Vectors.
  */
 
-#ifndef __GUI_SHADER_H__
-#define __GUI_SHADER_H__
+#ifndef __MATH_VECTOR_H__
+#define __MATH_VECTOR_H__
 
 /**
- * @addtogroup gui
+ * @addtogroup math
  *
  * @{
  */
 
-typedef struct Shader
+/**
+ * Vector.
+ */
+typedef struct Vector2f
 {
-  unsigned int    vertex_shader_id;
-  unsigned int    fragment_shader_id;
+  float x;
+  float y;
+} Vector2f;
 
-  /**
-   * OpenGL shader program ID.
-   *
-   * Each program has 1 vertex shader and 1
-   * fragment shader.
-   */
-  unsigned int    program_id;
-} Shader;
-
-Shader *
-shader_new (
-  const char * filepath);
-
-void
-shader_bind (
-  Shader * self);
-
-void
-shader_free (
-  Shader * self);
+typedef struct Vector3f
+{
+  float x;
+  float y;
+  float z;
+} Vector3f;
 
 /**
  * @}

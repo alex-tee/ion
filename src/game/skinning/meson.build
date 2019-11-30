@@ -16,6 +16,4 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_srcs += files ([
-  'skin_manager.c',
-  'skin.c',
   ])

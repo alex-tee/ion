@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
-ion_srcs += files ([
-  'ion_world.c',
-  ])
+install_data (
+  join_paths ('glsl', 'unchanged.vert'),
+  install_dir: glsldir)
+install_data (
+  join_paths ('glsl', 'unchanged.frag'),
+  install_dir: glsldir)

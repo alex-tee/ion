@@ -26,6 +26,36 @@ project(
     ],
   )
 
+prefix = get_option ('prefix')
+bindir = join_paths (prefix, get_option('bindir'))
+datadir = join_paths (prefix, get_option('datadir'))
+iondatadir = join_paths (datadir, 'ion')
+glsldir = join_paths (datadir, 'glsl')
+
+cdata = configuration_data ()
+cdata.set_quoted (
+  'PACKAGE_VERSION',
+  '@VCS_TAG@')
+cdata.set_quoted (
+  'COMPILER',
+  meson.get_compiler('c').get_id())
+cdata.set_quoted (
+  'PREFIX', prefix)
+cdata.set_quoted (
+  'COMPILER_VERSION',
+  meson.get_compiler('c').version())
+cdata.set_quoted (
+  'CONFIGURE_DATADIR',
+  datadir)
+cdata.set_quoted (
+  'GLSL_DIR', glsldir)
+cdata.set (
+  'MESON_SOURCE_ROOT',
+  meson.source_root ())
+cdata.set (
+  'MESON_BUILD_ROOT',
+  meson.build_root ())
+
 cc = meson.get_compiler ('c')
 
 root_inc = include_directories ('.')
@@ -54,9 +84,39 @@ ion_deps = [
   dependency('glfw3'),
   dependency('gl'),
   dependency('pangocairo'),
-  dependency('glew'),
+  dependency('x11'),
   cc.find_library('dl', required: false),
   cc.find_library('SOIL'),
 ]
 
+# create config.h
+tmp_h = configure_file (
+  output: 'tmp.h',
+  configuration: cdata,
+  )
+config_h_vcs = vcs_tag (
+  input: tmp_h,
+  output: 'config.h',
+  )
+config_h_dep = declare_dependency (
+  sources: config_h_vcs,
+  )
+ion_deps += config_h_dep
+
+subdir ('data')
 subdir ('src')
+
+summary = [
+  '',
+  '------',
+  'Ion @0@'.format(meson.project_version()),
+  '',
+  '  Build type: @0@'.format(
+    get_option('buildtype')),
+  '  Directories:',
+  '            prefix: @0@'.format(prefix),
+  '           datadir: @0@'.format(datadir),
+  '------',
+  ''
+]
+message('\n'.join(summary))

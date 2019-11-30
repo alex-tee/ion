@@ -19,8 +19,10 @@
 
 #include <glib.h>
 
-#include "game/skinning/skin.h"
 #include "game/ion_world.h"
+#include "gui/drawable.h"
+#include "gui/shader_manager.h"
+#include "gui/skin.h"
 #include "gui/texture.h"
 
 #define LOGO_FILE "logo.png"
@@ -31,35 +33,79 @@
 #define MENU_BG_FILE "menu-background.jpg"
 
 /**
- * Fills unset values from the default skin.
+ * @param width Set to negative to use the texture's.
+ * @param height Set to negative to use the texture's.
  */
 static void
-fill_values_from_default (
-  Skin * self)
+set_texture (
+  IonDrawable ** member,
+  const char *   full_path,
+  ShaderType     shader,
+  float          width,
+  float          height)
 {
-#define SET_TEXTURE(member,filename) \
-  if (!self->member) \
-    { \
-      char * full_path = \
-        g_build_filename ( \
-          ION_WORLD->skins_dir, "myskin", \
-          filename, NULL); \
-      self->member = \
-        texture_new_from_file (full_path); \
-      g_free (full_path); \
+  if (!(*member))
+    {
+      if (g_file_test (
+            full_path, G_FILE_TEST_EXISTS))
+        {
+          Texture * texture =
+            texture_new_from_file (full_path);
+          Vector2f position = { 0.f, 0.f };
+          Vector2f size = { width, height };
+          if (size.x < 0.f)
+            size.x = (float) texture->width;
+          if (size.y < 0.f)
+            size.y = (float) texture->height;
+          *member =
+            drawable_new_with_texture (
+              shader, texture, &position, &size);
+        }
     }
+}
 
-  SET_TEXTURE (logo, LOGO_FILE);
-  SET_TEXTURE (cursor.cursor, CURSOR_FILE);
-  SET_TEXTURE (
-    cursor.cursor_middle, CURSOR_MIDDLE_FILE);
-  SET_TEXTURE (
-    cursor.cursor_smoke, CURSOR_SMOKE_FILE);
-  SET_TEXTURE (
-    cursor.cursor_trail, CURSOR_TRAIL_FILE);
-  SET_TEXTURE (menu_bg, MENU_BG_FILE);
+static void
+set_all_textures (
+  Skin *       self,
+  const char * path)
+{
+  char * default_path =
+    g_build_filename (
+      ION_WORLD->skins_dir, "myskin", NULL);
 
-#undef SET_TEXTURE
+#define SET_TEXTURE(x,file,shader,w,h) \
+  { \
+    char * full_path = \
+      g_build_filename (path, file, NULL); \
+    if (!g_file_test ( \
+          full_path, G_FILE_TEST_EXISTS)) \
+      { \
+        g_free (full_path); \
+        full_path = \
+          g_build_filename ( \
+            default_path, file, NULL); \
+      } \
+    set_texture ( \
+      &self->x, full_path, SHADER_TYPE_##shader, \
+      w, h); \
+    g_free (full_path); \
+  }
+
+  SET_TEXTURE (
+    logo, LOGO_FILE, UNCHANGED, 960.f, 960.f);
+  SET_TEXTURE (
+    cursor.cursor, CURSOR_FILE, UNCHANGED, -1.f, -1.f);
+  SET_TEXTURE (
+    cursor.cursor_middle, CURSOR_MIDDLE_FILE,
+    UNCHANGED, -1.f, -1.f);
+  SET_TEXTURE (
+    cursor.cursor_smoke, CURSOR_SMOKE_FILE,
+    UNCHANGED, -1.f, -1.f);
+  SET_TEXTURE (
+    cursor.cursor_trail, CURSOR_TRAIL_FILE,
+    UNCHANGED, -1.f, -1.f);
+  SET_TEXTURE (
+    menu_bg, MENU_BG_FILE, UNCHANGED, 1920.f, 1080.f);
 }
 
 /**
@@ -144,31 +190,7 @@ skin_new_from_path (
         }
     }
 
-#define SET_TEXTURE(member,filename) \
-      full_resource_path = \
-        g_build_filename ( \
-          path, filename, NULL); \
-      if (g_file_test ( \
-            full_resource_path, G_FILE_TEST_EXISTS)) \
-        { \
-          self->member = \
-            texture_new_from_file (full_resource_path); \
-        } \
-      g_free (full_resource_path)
-
-  char * full_resource_path;
-  SET_TEXTURE (logo, LOGO_FILE);
-  SET_TEXTURE (cursor.cursor, CURSOR_FILE);
-  SET_TEXTURE (
-    cursor.cursor_middle, CURSOR_MIDDLE_FILE);
-  SET_TEXTURE (
-    cursor.cursor_smoke, CURSOR_SMOKE_FILE);
-  SET_TEXTURE (
-    cursor.cursor_trail, CURSOR_TRAIL_FILE);
-  SET_TEXTURE (
-    menu_bg, MENU_BG_FILE);
-
-  fill_values_from_default (self);
+  set_all_textures (self, path);
 
   return self;
 }
@@ -181,23 +203,6 @@ skin_create_default (void)
   self->creator = g_strdup ("Ion team");
 
   return self;
-}
-
-void
-skin_update_texture_sizes (
-  Skin * self,
-  int    fb_width,
-  int    fb_height)
-{
-#define UPDATE_TEXTURE_SIZE(member) \
-  if (self->member) \
-    { \
-      texture_update_size ( \
-        self->member, fb_width, fb_height); \
-      g_message ("height %u", self->member->height); \
-    }
-
-  UPDATE_TEXTURE_SIZE (logo);
 }
 
 char *

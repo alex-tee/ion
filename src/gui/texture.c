@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 
-#include <GL/glew.h>
+#include <glad/glad_glx.h>
 #include <GLFW/glfw3.h>
 #include <glib.h>
 #include <SOIL/SOIL.h>
@@ -81,7 +81,7 @@ texture_new_from_raw_data (
     GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexImage2D (
     GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-    0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+    0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
   texture->orig_width = width;
   texture->orig_height = height;
@@ -121,19 +121,35 @@ texture_new_from_file (
   int width, height;
   unsigned char * pixels =
     SOIL_load_image (
-      full_path, &width, &height, 0, SOIL_LOAD_RGBA);
+      full_path, &width, &height, 0,
+      SOIL_LOAD_RGBA);
   glTexImage2D (
     GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-    0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+    0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  SOIL_free_image_data (pixels);
 
   texture->orig_width = width;
   texture->orig_height = height;
   texture->width = width;
   texture->height = height;
 
+  /* FIXME free image data */
+
   return texture;
 }
 
+/**
+ * Binds the texture to be used.
+ */
+void
+texture_bind (
+  Texture * self)
+{
+  glActiveTexture (GL_TEXTURE0);
+  glBindTexture (GL_TEXTURE_2D, self->id);
+}
+
+#if 0
 /**
  * Draws the texture at the given global coordinates,
  * optionally applying any of the given matrices, if
@@ -149,7 +165,7 @@ texture_draw (
 {
   /* Render a texture in immediate mode. */
   glPushMatrix ();
-  glBindTexture (GL_TEXTURE_2D, self->id);
+  texture_bind (self);
   glColor3f (1.f, 1.0f, 1.0f);
   /*unsigned int program =*/
     /*ION_WORLD->shader_manager->rotate_2d_shader->*/
@@ -191,3 +207,4 @@ texture_draw (
       /*program_id);*/
   glPopMatrix ();
 }
+#endif

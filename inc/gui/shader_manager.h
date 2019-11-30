@@ -34,10 +34,15 @@ typedef struct Shader Shader;
  * @{
  */
 
+typedef enum ShaderType
+{
+  SHADER_TYPE_UNCHANGED,
+  NUM_SHADER_TYPES,
+} ShaderType;
+
 typedef struct ShaderManager
 {
-  Shader *      rotate_2d_shader;
-  Shader *      unchanged_shader;
+  Shader *      shaders[NUM_SHADER_TYPES];
 } ShaderManager;
 
 ShaderManager *

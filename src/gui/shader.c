@@ -17,15 +17,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 
-#include <GL/glew.h>
+#include <glad/glad_glx.h>
 #include <GLFW/glfw3.h>
 #include <glib.h>
 
 #include "gui/shader.h"
-
-#define GLSL_PATH "/home/alex/Documents/git/ion/inc/gui/gsl"
 
 Shader *
 shader_new (
@@ -33,16 +33,18 @@ shader_new (
 {
   Shader * self = calloc (1, sizeof (Shader));
 
+  self->program_id = glCreateProgram ();
+
   unsigned int vertex_id =
     glCreateShader (GL_VERTEX_SHADER);
   char * _filepath =
     g_build_filename (
-      GLSL_PATH, filename, NULL);
+      GLSL_DIR, filename, NULL);
   char * filepath =
     g_strdup_printf ("%s.vert", _filepath);
   char * content;
   gsize ulength;
-  GError * error;
+  GError * error = NULL;
   g_file_get_contents (
     filepath, &content, &ulength, &error);
   int length = (int) ulength;
@@ -61,7 +63,8 @@ shader_new (
       glGetShaderInfoLog (
         vertex_id, 512, NULL, info);
       g_critical (
-        "Shader compilation failed: %s", info);
+        "Shader %s compilation failed: %s",
+        filename, info);
       return NULL;
     }
 
@@ -69,9 +72,10 @@ shader_new (
     glCreateShader (GL_FRAGMENT_SHADER);
   _filepath =
     g_build_filename (
-      GLSL_PATH, filename, NULL);
+      GLSL_DIR, filename, NULL);
   filepath =
     g_strdup_printf ("%s.frag", _filepath);
+  error = NULL;
   g_file_get_contents (
     filepath, &content, &ulength, &error);
   length = (int) ulength;
@@ -88,13 +92,22 @@ shader_new (
       glGetShaderInfoLog (
         fragment_id, 512, NULL, info);
       g_critical (
-        "Shader compilation failed: %s", info);
+        "Shader %s compilation failed: %s",
+        filename, info);
       return NULL;
     }
 
-  self->program_id = glCreateProgram ();
+  self->vertex_shader_id = vertex_id;
+  self->fragment_shader_id = fragment_id;
+
   glAttachShader (self->program_id, vertex_id);
   glAttachShader (self->program_id, fragment_id);
+
+  glBindAttribLocation (
+    self->program_id, 0, "position");
+  glBindAttribLocation (
+    self->program_id, 1, "tex_coord");
+
   glLinkProgram (self->program_id);
   glGetProgramiv (
     self->program_id, GL_LINK_STATUS, &success);
@@ -103,12 +116,44 @@ shader_new (
       glGetProgramInfoLog (
         self->program_id, 512, NULL, info);
       g_critical (
-        "Shader linking failed: %s", info);
+        "Shader %s linking failed: %s",
+        filename, info);
       return NULL;
     }
 
-  glDeleteShader (vertex_id);
-  glDeleteShader (fragment_id);
+  glValidateProgram (self->program_id);
+  glGetProgramiv (
+    self->program_id, GL_VALIDATE_STATUS, &success);
+  if (!success)
+    {
+      glGetProgramInfoLog (
+        self->program_id, 512, NULL, info);
+      g_critical (
+        "Shader %s program validation failed: %s",
+        filename, info);
+      return NULL;
+    }
+
+  g_message ("Shader program %s ready.", filename);
 
   return self;
+}
+
+void
+shader_bind (
+  Shader * self)
+{
+  glUseProgram (self->program_id);
+}
+
+void
+shader_free (
+  Shader * self)
+{
+  /*glDetachShader (self->vertex_shader_id);*/
+  /*glDetachShader (self->fragment_shader_id);*/
+  glDeleteShader (self->vertex_shader_id);
+  glDeleteShader (self->fragment_shader_id);
+
+  glDeleteProgram (self->program_id);
 }

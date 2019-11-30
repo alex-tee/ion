@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 
+#include <glad/glad_glx.h>
 #include <GLFW/glfw3.h>
 #include <glib.h>
 
@@ -26,6 +27,19 @@
 
 #include "gui/gl.h"
 #include "gui/texture.h"
+
+static void
+debug_message_cb (
+  GLenum source,
+  GLenum type,
+  GLuint id,
+  GLenum severity,
+  GLsizei length,
+  const GLchar *message,
+  const void *userParam)
+{
+  g_warning ("%s", message);
+}
 
 /**
  * Initialization during startup.
@@ -44,15 +58,20 @@ ion_gl_init (
   int width, height;
   glfwGetFramebufferSize (window, &width, &height);
   glViewport (0, 0, width, height);
+  g_message ("viewport set to %d %d",
+    width, height);
 
   glBlendFunc (
     GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable (GL_TEXTURE_2D);
-  glMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  glOrtho (0, width, height, 0, -1, 1);
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
+  /*glMatrixMode (GL_PROJECTION);*/
+  /*glLoadIdentity ();*/
+  /*glOrtho (0, width, height, 0, -1, 1);*/
+  /*glMatrixMode (GL_MODELVIEW);*/
+  /*glLoadIdentity ();*/
+
+  glDebugMessageCallback (
+    debug_message_cb, NULL);
 }
 
 /**
@@ -65,6 +84,7 @@ ion_gl_draw_test_rectangle (
   float width,
   float height)
 {
+#if 0
   glPushMatrix ();
   glBindTexture (GL_TEXTURE_2D, 0);
 
@@ -78,4 +98,5 @@ ion_gl_draw_test_rectangle (
   glEnd ();
 
   glPopMatrix ();
+#endif
 }

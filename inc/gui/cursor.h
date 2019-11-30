@@ -21,6 +21,7 @@
 #define __GUI_CURSOR_H__
 
 typedef struct Texture Texture;
+typedef struct IonDrawable IonDrawable;
 
 /**
  * @addtogroup gui
@@ -29,12 +30,12 @@ typedef struct Texture Texture;
  */
 
 /** Times to rotate per second, if rotate is on. */
-#define CURSOR_RPM 80
+#define CURSOR_RPM 2
 
 /**
  * A drawable cursor, as part of a Skin.
  */
-typedef struct Cursor
+typedef struct IonCursor
 {
   /** Whether the cursor should expand when clicked. */
   int             expand;
@@ -45,15 +46,15 @@ typedef struct Cursor
   /** Last rotation angle. */
   float           last_angle;
 
-  Texture *       cursor;
-  Texture *       cursor_middle;
-  Texture *       cursor_smoke;
-  Texture *       cursor_trail;
-} Cursor;
+  IonDrawable *      cursor;
+  IonDrawable *      cursor_middle;
+  IonDrawable *      cursor_smoke;
+  IonDrawable *      cursor_trail;
+} IonCursor;
 
 void
 cursor_draw (
-  Cursor * self);
+  IonCursor * self);
 
 /**
  * @}

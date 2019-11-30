@@ -28,13 +28,11 @@ shader_manager_new (void)
   ShaderManager * self =
     calloc (1, sizeof (ShaderManager));
 
-  /*self->rotate_2d_shader =*/
+  self->shaders[SHADER_TYPE_UNCHANGED] =
+    shader_new ("unchanged");
+  /*self->unchanged_shader =*/
     /*shader_new (*/
-      /*SHADER_TYPE_VERTEX,*/
-      /*"rotate_by_angle.vert");*/
-  self->unchanged_shader =
-    shader_new (
-      "unchanged");
+      /*"unchanged");*/
 
   return self;
 }

@@ -21,8 +21,8 @@
 
 #include <glib.h>
 
-#include "game/skinning/skin_manager.h"
-#include "game/skinning/skin.h"
+#include "gui/skin_manager.h"
+#include "gui/skin.h"
 
 /**
  * Creates and initializes the skin manager.

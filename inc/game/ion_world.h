@@ -30,6 +30,7 @@ typedef struct GLFWwindow GLFWwindow;
 typedef struct SkinManager SkinManager;
 typedef struct Texture Texture;
 typedef struct ShaderManager ShaderManager;
+typedef struct MainMenu MainMenu;
 
 /**
  * @addtogroup game
@@ -75,6 +76,12 @@ typedef struct IonWorld
   /** The game GLFW window. */
   GLFWwindow *     window;
 
+  int              viewport_width;
+  int              viewport_height;
+
+  int              monitor_width;
+  int              monitor_height;
+
   char *           skins_dir;
   char *           beatmaps_dir;
 
@@ -87,6 +94,8 @@ typedef struct IonWorld
   /* FIXME delete */
   Texture *        test_texture;
 
+  MainMenu *       main_menu;
+
   ShaderManager *  shader_manager;
 } IonWorld;
 
@@ -98,7 +107,13 @@ IonWorld * ion_world;
  */
 IonWorld *
 ion_world_new (
-  GLFWwindow * window);
+  GLFWwindow * window,
+  int          monitor_width,
+  int          monitor_height);
+
+void
+ion_world_load_skin (
+  IonWorld * self);
 
 /**
  * To be called when the framebuffer size changes.

@@ -85,6 +85,13 @@ texture_new_from_raw_data (
   unsigned char * pixels);
 
 /**
+ * Binds the texture to be used.
+ */
+void
+texture_bind (
+  Texture * self);
+
+/**
  * Generate a texture in the backend for the given
  * file.
  *

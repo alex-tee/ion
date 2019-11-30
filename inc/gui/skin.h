@@ -31,6 +31,7 @@
 
 typedef struct AudioClip AudioClip;
 typedef struct Texture Texture;
+typedef struct IonDrawable IonDrawable;
 
 /**
  * @addtogroup skinning
@@ -61,10 +62,10 @@ typedef struct Skin
   IonRGBA         combo_colors[16];
   int             num_combo_colors;
 
-  Cursor          cursor;
+  IonCursor          cursor;
 
-  Texture *       logo;
-  Texture *       menu_bg;
+  IonDrawable *      logo;
+  IonDrawable *      menu_bg;
   Texture *       selection_mod_autoplay;
   Texture *       selection_mod_cinema;
   Texture *       selection_mod_doubletime;

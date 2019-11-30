@@ -16,7 +16,10 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_main = files ('main.c')
-ion_srcs = files ([])
+ion_srcs = files ([
+  'glad.c',
+  'glad_glx.c',
+  ])
 
 subdir ('game')
 subdir ('gui')

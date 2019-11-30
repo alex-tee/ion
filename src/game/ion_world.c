@@ -23,10 +23,12 @@
 #include <glib.h>
 
 #include "game/ion_world.h"
-#include "game/skinning/skin_manager.h"
-#include "game/skinning/skin.h"
+#include "gui/drawable.h"
 #include "gui/gl.h"
+#include "gui/main_menu.h"
 #include "gui/shader_manager.h"
+#include "gui/skin_manager.h"
+#include "gui/skin.h"
 #include "gui/texture.h"
 #include "utils/pango.h"
 
@@ -35,13 +37,17 @@
  */
 IonWorld *
 ion_world_new (
-  GLFWwindow * window)
+  GLFWwindow * window,
+  int          monitor_width,
+  int          monitor_height)
 {
   IonWorld * self = calloc (1, sizeof (IonWorld));
 
   ION_WORLD = self;
 
   self->window = window;
+  self->monitor_width = monitor_width;
+  self->monitor_height = monitor_height;
   self->screen = ION_WORLD_SCREEN_MAIN_MENU;
   self->skins_dir =
     g_build_filename (
@@ -51,9 +57,6 @@ ion_world_new (
     g_build_filename (
       g_get_home_dir (), ".config", "ion",
       "beatmaps", NULL);
-
-  self->skin_manager =
-    skin_manager_new (self->skins_dir);
 
   self->shader_manager =
     shader_manager_new ();
@@ -66,6 +69,15 @@ ion_world_new (
   return self;
 }
 
+void
+ion_world_load_skin (
+  IonWorld * self)
+{
+  self->skin_manager =
+    skin_manager_new (self->skins_dir);
+}
+
+#if 0
 /**
  * To be called when the framebuffer size changes.
  */
@@ -83,6 +95,7 @@ ion_world_update_texture_sizes (
     self->skin_manager->current_skin, fb_width,
     fb_height);
 }
+#endif
 
 /**
  * Renders the current scene.
@@ -101,9 +114,12 @@ ion_world_render_scene (
   double xpos, ypos;
   glfwGetCursorPos (self->window, &xpos, &ypos);
   xpos =
-    (xpos * (double) fb_width) / (double) win_width;
+    (xpos * (double) fb_width) /
+    (double) win_width;
   ypos =
-    (ypos * (double) fb_height) / (double) win_height;
+    (ypos * (double) fb_height) /
+    (double) win_height;
+  ypos = fb_height - ypos;
 
   glClear(GL_COLOR_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
@@ -115,39 +131,23 @@ ion_world_render_scene (
   switch (self->screen)
     {
     case ION_WORLD_SCREEN_WELCOME:
-      texture_draw (
-        self->test_texture, 0.f, 0.f, 0.f, 1.f);
+      /*texture_draw (*/
+        /*self->test_texture, 0.f, 0.f, 0.f, 1.f);*/
       ion_gl_draw_test_rectangle (
         40.f, 40.f, 1000.f, 20.f);
       break;
     case ION_WORLD_SCREEN_MAIN_MENU:
       {
         /* draw bg stretched */
-        texture =
-          self->skin_manager->current_skin->menu_bg;
-        glPushMatrix ();
-        glBindTexture (GL_TEXTURE_2D, texture->id);
-        glColor3f (1.f, 1.0f, 1.0f);
-        glBegin (GL_QUADS);
-        glTexCoord2f (0.0f, 0.0f);
-        glVertex2f (0.f, 0.f);
-        glTexCoord2f (1.0f, 0.0f);
-        glVertex2f (fb_width, 0.f);
-        glTexCoord2f (1.0f, 1.0f);
-        glVertex2f (fb_width, fb_height);
-        glTexCoord2f (0.0f, 1.0f);
-        glVertex2f (0.f, fb_height);
-        glEnd ();
-        glPopMatrix ();
+        drawable_draw (
+          self->skin_manager->current_skin->
+          menu_bg);
 
-        /* draw logo */
-        texture =
-          self->skin_manager->current_skin->logo;
-        texture_draw (
-          texture,
-          fb_width / 2 - texture->width / 2,
-          fb_height / 2 - texture->height / 2,
-          0.f, 1.f);
+        drawable_draw (
+          self->skin_manager->current_skin->
+          logo);
+
+        main_menu_draw (self->main_menu);
 
         /* draw cursor */
         cursor_draw (

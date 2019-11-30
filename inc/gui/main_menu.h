@@ -17,14 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * \file
- *
- * GLSL shader.
- */
+#ifndef __GUI_MAIN_MENU_H__
+#define __GUI_MAIN_MENU_H__
 
-#ifndef __GUI_SHADER_H__
-#define __GUI_SHADER_H__
+typedef struct Texture Texture;
 
 /**
  * @addtogroup gui
@@ -32,31 +28,16 @@
  * @{
  */
 
-typedef struct Shader
+/**
+ * A drawable logo, as part of a Skin.
+ */
+typedef struct MainMenu
 {
-  unsigned int    vertex_shader_id;
-  unsigned int    fragment_shader_id;
-
-  /**
-   * OpenGL shader program ID.
-   *
-   * Each program has 1 vertex shader and 1
-   * fragment shader.
-   */
-  unsigned int    program_id;
-} Shader;
-
-Shader *
-shader_new (
-  const char * filepath);
+} MainMenu;
 
 void
-shader_bind (
-  Shader * self);
-
-void
-shader_free (
-  Shader * self);
+main_menu_draw (
+  MainMenu * self);
 
 /**
  * @}
