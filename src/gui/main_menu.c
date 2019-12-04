@@ -22,6 +22,8 @@
 #include <glib.h>
 
 #include "game/ion_world.h"
+#include "gui/button_with_text.h"
+#include "gui/drawable.h"
 #include "gui/main_menu.h"
 #include "gui/shader.h"
 #include "gui/shader_manager.h"
@@ -29,48 +31,121 @@
 #include "gui/skin.h"
 #include "gui/texture.h"
 
+/**
+ * Updates the main menu before drawing.
+ */
+void
+main_menu_update (
+  MainMenu * self)
+{
+  double xpos, ypos;
+  glfwGetCursorPos (
+    ION_WORLD->window, &xpos, &ypos);
+
+  int state =
+    glfwGetMouseButton (
+      ION_WORLD->window, GLFW_MOUSE_BUTTON_LEFT);
+  if (state == GLFW_PRESS &&
+      drawable_hit (CURRENT_LOGO, xpos, ypos))
+    {
+      self->showing_options = 1;
+    }
+
+  float logo_transition = 24.f;
+  if (self->showing_options)
+    {
+      /* move logo */
+      Vector2f new_pos = CURRENT_LOGO->position;
+      new_pos.x =
+        MAX (40.f, new_pos.x - logo_transition);
+      drawable_update_position (
+        CURRENT_LOGO, &new_pos,
+        &CURRENT_LOGO->size);
+
+      /* move options positions */
+      int y_pad = 4.f;
+      button_with_text_update_position (
+        self->play,
+        CURRENT_LOGO->position.x +
+          CURRENT_LOGO->size.x,
+        (CURRENT_LOGO->position.y +
+          CURRENT_LOGO->size.y / 2.f) +
+          (self->play->left_drawable->size.y +
+             y_pad) * 3.f);
+      button_with_text_update_position (
+        self->options,
+        CURRENT_LOGO->position.x +
+          CURRENT_LOGO->size.x,
+        (CURRENT_LOGO->position.y +
+          CURRENT_LOGO->size.y / 2.f) +
+          (self->play->left_drawable->size.y +
+             y_pad) * 2.f);
+      button_with_text_update_position (
+        self->exit,
+        CURRENT_LOGO->position.x +
+          CURRENT_LOGO->size.x,
+        (CURRENT_LOGO->position.y +
+          CURRENT_LOGO->size.y / 2.f) +
+          (self->play->left_drawable->size.y +
+             y_pad) * 1.f);
+    }
+  else
+    {
+      /* move logo */
+      Vector2f new_pos = CURRENT_LOGO->position;
+      new_pos.x =
+        MIN (
+          CURRENT_LOGO->size.x / 2.f,
+          new_pos.x + logo_transition);
+      drawable_update_position (
+        CURRENT_LOGO, &new_pos,
+        &CURRENT_LOGO->size);
+    }
+}
+
+static void
+draw_options (
+  MainMenu * self)
+{
+  button_with_text_draw (self->play);
+  button_with_text_draw (self->options);
+  button_with_text_draw (self->exit);
+}
+
 void
 main_menu_draw (
   MainMenu * self)
 {
-  int fb_width, fb_height;
-  glfwGetFramebufferSize (
-    ION_WORLD->window, &fb_width, &fb_height);
+  /* draw bg stretched */
+  drawable_draw (CURRENT_SKIN->menu_bg);
 
-#if 0
+  /* draw options */
+  if (self->showing_options)
+    {
+      draw_options (self);
+    }
 
-  /* ---- draw logo ----- */
-  unsigned int program =
-    ION_WORLD->shader_manager->unchanged_shader->
-      program_id;
-  Texture * texture =
-    ION_WORLD->skin_manager->current_skin->logo;
-  GLint baseImageLoc =
-    glGetUniformLocation (program, "baseImage");
-  GLint normalMapLoc =
-    glGetUniformLocation(program, "normalMap");
-  GLint shadowMapLoc =
-    glGetUniformLocation(program, "shadowMap");
+  /* draw logo */
+  drawable_draw (CURRENT_LOGO);
+}
 
-  glUseProgram (program);
-  glUniform1i(baseImageLoc, 0); // Texture unit 0 is for base images.
-  glUniform1i(normalMapLoc, 2); // Texture unit 2 is for normal maps.
-  glUniform1i(shadowMapLoc, 4); // Texture unit 4 is for shadow maps.
+/**
+ * Creates the main menu.
+ */
+MainMenu *
+main_menu_new (void)
+{
+  MainMenu * self = calloc (1, sizeof (MainMenu));
 
-  // When rendering an objectwith this program.
-  glActiveTexture(GL_TEXTURE0 + 0);
-  glBindTexture(GL_TEXTURE_2D, texture->id);
+  self->play =
+    button_with_text_new (
+      "Play", 1);
+  self->options =
+    button_with_text_new (
+      "Options", 1);
+  self->exit =
+    button_with_text_new (
+      "Exit", 1);
 
-  glPushMatrix ();
-  glTranslatef (
-    400.f, 20.f, 0.f);
-  texture_draw (
-    texture,
-    (float) fb_width / 2.f -
-      (float) texture->width / 2.f,
-    (float) fb_height / 2.f -
-      (float) texture->height / 2.f,
-    0.f, 1.f);
-  glPopMatrix ();
-#endif
+  return self;
 }

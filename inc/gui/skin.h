@@ -39,6 +39,11 @@ typedef struct IonDrawable IonDrawable;
  * @{
  */
 
+#define CURRENT_SKIN \
+  (ION_WORLD->skin_manager->current_skin)
+#define CURRENT_LOGO \
+  (CURRENT_SKIN->logo)
+
 typedef enum SkinFormatVersion
 {
   SKIN_FORMAT_VERSION_1_0,
@@ -66,6 +71,11 @@ typedef struct Skin
 
   IonDrawable *      logo;
   IonDrawable *      menu_bg;
+
+  Texture *       button_left;
+  Texture *       button_middle;
+  Texture *       button_right;
+
   Texture *       selection_mod_autoplay;
   Texture *       selection_mod_cinema;
   Texture *       selection_mod_doubletime;

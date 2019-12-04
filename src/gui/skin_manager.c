@@ -52,7 +52,7 @@ skin_manager_new (
     }
 
   self->current_skin =
-    self->available_skins[2];
+    self->available_skins[1];
 
   return self;
 }

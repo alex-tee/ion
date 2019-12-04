@@ -26,6 +26,13 @@
 #include "gui/shader.h"
 #include "gui/texture.h"
 
+/**
+ * Creates a new drawable with a texture.
+ *
+ * @param position Position to start drawing at.
+ * @param size Size of the drawable, independent
+ *   of the texture.
+ */
 IonDrawable *
 drawable_new_with_texture (
   ShaderType shader_type,
@@ -85,6 +92,13 @@ drawable_new_with_texture (
   return self;
 }
 
+/**
+ * Updates the position and size of the drawable.
+ *
+ * @param position Position to start drawing at.
+ * @param size Size of the drawable, independent
+ *   of the texture.
+ */
 void
 drawable_update_position (
   IonDrawable * self,
@@ -165,6 +179,23 @@ drawable_draw (
   glDrawElements (
     GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray (0);
+}
+
+/**
+ * Returns if the drawable is hit by the given
+ * x,y positions.
+ */
+int
+drawable_hit (
+  IonDrawable * self,
+  double        x,
+  double        y)
+{
+  return
+    x >= self->position.x &&
+    x < self->position.x + self->size.x &&
+    y >= self->position.y &&
+    y < self->position.y + self->size.y;
 }
 
 void

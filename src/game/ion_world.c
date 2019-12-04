@@ -75,6 +75,8 @@ ion_world_load_skin (
 {
   self->skin_manager =
     skin_manager_new (self->skins_dir);
+
+  self->main_menu = main_menu_new ();
 }
 
 #if 0
@@ -138,25 +140,22 @@ ion_world_render_scene (
       break;
     case ION_WORLD_SCREEN_MAIN_MENU:
       {
-        /* draw bg stretched */
-        drawable_draw (
-          self->skin_manager->current_skin->
-          menu_bg);
+        /* update variables */
+        main_menu_update (
+          self->main_menu);
 
-        drawable_draw (
-          self->skin_manager->current_skin->
-          logo);
-
+        /* draw */
         main_menu_draw (self->main_menu);
-
-        /* draw cursor */
-        cursor_draw (
-          &self->skin_manager->current_skin->cursor);
       }
       break;
     default:
       break;
     }
+
+  /* draw cursor */
+  cursor_draw (
+    &self->skin_manager->current_skin->cursor);
+
   self->last_draw_time = glfwGetTime ();
 }
 

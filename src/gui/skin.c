@@ -17,6 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <GLFW/glfw3.h>
 #include <glib.h>
 
 #include "game/ion_world.h"
@@ -31,6 +32,9 @@
 #define CURSOR_SMOKE_FILE "cursor-smoke.png"
 #define CURSOR_TRAIL_FILE "cursortrail.png"
 #define MENU_BG_FILE "menu-background.jpg"
+#define BUTTON_LEFT_FILE "button-left.png"
+#define BUTTON_MIDDLE_FILE "button-middle.png"
+#define BUTTON_RIGHT_FILE "button-right.png"
 
 /**
  * @param width Set to negative to use the texture's.
@@ -73,39 +77,71 @@ set_all_textures (
     g_build_filename (
       ION_WORLD->skins_dir, "myskin", NULL);
 
-#define SET_TEXTURE(x,file,shader,w,h) \
+#define GET_FULL_PATH(file) \
+  char * full_path = \
+    g_build_filename (path, file, NULL); \
+  if (!g_file_test ( \
+        full_path, G_FILE_TEST_EXISTS)) \
+    { \
+      g_free (full_path); \
+      full_path = \
+        g_build_filename ( \
+          default_path, file, NULL); \
+    }
+
+#define SET_TEXTURE_AS_DRAWABLE(x,file,shader,w,h) \
   { \
-    char * full_path = \
-      g_build_filename (path, file, NULL); \
-    if (!g_file_test ( \
-          full_path, G_FILE_TEST_EXISTS)) \
-      { \
-        g_free (full_path); \
-        full_path = \
-          g_build_filename ( \
-            default_path, file, NULL); \
-      } \
+    GET_FULL_PATH(file); \
     set_texture ( \
       &self->x, full_path, SHADER_TYPE_##shader, \
       w, h); \
     g_free (full_path); \
   }
 
-  SET_TEXTURE (
+#define SET_TEXTURE(x,file) \
+  { \
+    GET_FULL_PATH(file); \
+    self->x = texture_new_from_file (full_path); \
+    g_free (full_path); \
+  }
+
+  SET_TEXTURE_AS_DRAWABLE (
     logo, LOGO_FILE, UNCHANGED, 960.f, 960.f);
   SET_TEXTURE (
-    cursor.cursor, CURSOR_FILE, UNCHANGED, -1.f, -1.f);
+    button_left, BUTTON_LEFT_FILE);
   SET_TEXTURE (
+    button_middle, BUTTON_MIDDLE_FILE);
+  SET_TEXTURE (
+    button_right, BUTTON_RIGHT_FILE);
+  SET_TEXTURE_AS_DRAWABLE (
+    cursor.cursor, CURSOR_FILE, UNCHANGED, -1.f, -1.f);
+  SET_TEXTURE_AS_DRAWABLE (
     cursor.cursor_middle, CURSOR_MIDDLE_FILE,
     UNCHANGED, -1.f, -1.f);
-  SET_TEXTURE (
+  SET_TEXTURE_AS_DRAWABLE (
     cursor.cursor_smoke, CURSOR_SMOKE_FILE,
     UNCHANGED, -1.f, -1.f);
-  SET_TEXTURE (
+  SET_TEXTURE_AS_DRAWABLE (
     cursor.cursor_trail, CURSOR_TRAIL_FILE,
     UNCHANGED, -1.f, -1.f);
-  SET_TEXTURE (
-    menu_bg, MENU_BG_FILE, UNCHANGED, 1920.f, 1080.f);
+  SET_TEXTURE_AS_DRAWABLE (
+    menu_bg, MENU_BG_FILE, UNCHANGED,
+    1920.f, 1080.f);
+
+  int fb_width, fb_height;
+  glfwGetFramebufferSize (
+    ION_WORLD->window, &fb_width, &fb_height);
+
+  /* set logo to middle */
+  Vector2f pos;
+  pos.x =
+    (float) fb_width / 2.f -
+    self->logo->size.x / 2.f;
+  pos.y =
+    (float) fb_height / 2.f -
+    self->logo->size.y / 2.f;
+  drawable_update_position (
+    self->logo, &pos, &self->logo->size);
 }
 
 /**

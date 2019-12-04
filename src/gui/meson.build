@@ -16,6 +16,7 @@
 # along with Ion.  If not, see <https://www.gnu.org/licenses/>.
 
 ion_srcs += files ([
+  'button_with_text.c',
   'cursor.c',
   'drawable.c',
   'gl.c',

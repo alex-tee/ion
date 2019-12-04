@@ -91,6 +91,13 @@ typedef struct IonDrawable
   unsigned int  indices[6];
 } IonDrawable;
 
+/**
+ * Creates a new drawable with a texture.
+ *
+ * @param position Position to start drawing at.
+ * @param size Size of the drawable, independent
+ *   of the texture.
+ */
 IonDrawable *
 drawable_new_with_texture (
   ShaderType shader_type,
@@ -98,6 +105,13 @@ drawable_new_with_texture (
   Vector2f * position,
   Vector2f * size);
 
+/**
+ * Updates the position and size of the drawable.
+ *
+ * @param position Position to start drawing at.
+ * @param size Size of the drawable, independent
+ *   of the texture.
+ */
 void
 drawable_update_position (
   IonDrawable * self,
@@ -107,6 +121,16 @@ drawable_update_position (
 void
 drawable_draw (
   IonDrawable * self);
+
+/**
+ * Returns if the drawable is hit by the given
+ * x,y positions.
+ */
+int
+drawable_hit (
+  IonDrawable * self,
+  double        x,
+  double        y);
 
 void
 drawable_free (

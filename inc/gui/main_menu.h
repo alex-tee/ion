@@ -21,6 +21,7 @@
 #define __GUI_MAIN_MENU_H__
 
 typedef struct Texture Texture;
+typedef struct ButtonWithText ButtonWithText;
 
 /**
  * @addtogroup gui
@@ -29,11 +30,31 @@ typedef struct Texture Texture;
  */
 
 /**
- * A drawable logo, as part of a Skin.
+ * Main menu options.
  */
 typedef struct MainMenu
 {
+  /** 1 if currently showing options (play, options,
+   * etc). */
+  int        showing_options;
+
+  ButtonWithText * play;
+  ButtonWithText * options;
+  ButtonWithText * exit;
 } MainMenu;
+
+/**
+ * Creates the main menu.
+ */
+MainMenu *
+main_menu_new (void);
+
+/**
+ * Updates the main menu before drawing.
+ */
+void
+main_menu_update (
+  MainMenu * self);
 
 void
 main_menu_draw (
